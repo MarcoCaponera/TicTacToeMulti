@@ -11,7 +11,7 @@
 
 int s;
 
-int init_server()
+int main(int argc, char **argv)
 {
 #ifdef _WIN32
     WSADATA wsa_data;
@@ -39,6 +39,21 @@ int init_server()
     {
         printf("unable to bind UDP socket\n");
         return -1;
+    }
+
+    for(;;)
+    {
+        char buffer[4096];
+        struct sockaddr_in sender_in;
+        int sender_in_size = sizeof(sender_in);
+        int len = recvfrom(s, buffer, 4096, 0, (struct sockaddr*)&sender_in, &sender_in_size);
+        if (len > 0)
+        {
+            char addr_as_string[64];
+            inet_ntop(AF_INET, &sender_in.sin_addr, addr_as_string, 64);
+            printf("received %d bytes from %s:%d\n", len, addr_as_string, ntohs(sender_in.sin_port));
+            printf("message: %s\n", buffer);
+        }
     }
 
     return 0;
