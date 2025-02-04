@@ -54,6 +54,7 @@ int dict_setup(dictionary_t* dict, const size_t num_slots)
     }
     else
     {
+        printf("rehashing\n");
         dictionary_slot_t* new_slots = malloc(sizeof(dictionary_slot_t) * num_slots);
         memset(new_slots, 0, sizeof(dictionary_slot_t) * num_slots);
         if(!new_slots)
@@ -188,7 +189,7 @@ void dict_iter_keys(dictionary_t* map, void (*callback)(const char* key))
 }
 
 
-int dict_remove(dictionary_t * map, const char* key)
+int dict_remove(dictionary_t * map, const char* key, void (*callback)(void**))
 {
     const size_t hash = djb33x_hash(key, strlen(key));
     const size_t slot = hash % map->slots_number;
@@ -199,8 +200,8 @@ int dict_remove(dictionary_t * map, const char* key)
     {
         if(!strcmp(*(char**)dynarray_get_at_index(&selected_slot->keys, i), key))
         {
-            dynarray_remove(&selected_slot->keys, i);
-            dynarray_remove(&selected_slot->values, i);
+            dynarray_remove(&selected_slot->keys, i, callback);
+            dynarray_remove(&selected_slot->values, i, callback);
             return 0;
         }
     }

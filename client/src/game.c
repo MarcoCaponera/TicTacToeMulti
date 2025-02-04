@@ -1,9 +1,10 @@
 #include "game.h"
-#include "tictactoe_server.h"
+#include "client.h"
 #include <stdio.h>
 
 int playing;
 game_state_t game_state;
+client_t* client;
 
 void game_play()
 {
@@ -21,10 +22,12 @@ void game_play()
     }
 }
 
-void game_init()
+int game_init()
 {
-    if(init_server())
-    {
-        printf("could not initialize server\n");
-    }
+    game_state = MENU;
+    playing = 1;
+
+    client = init_client();
+
+    return 0;
 }

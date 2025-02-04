@@ -13,12 +13,8 @@
 #include "player.h"
 #include "room.h"
 #include "dictionary.h"
+#include "general_defines.h"
 
-#define COMMAND_JOIN 0
-#define COMMAND_CHALLENGE 1
-#define COMMAND_MOVE 2
-#define COMMAND_QUIT 3
-#define COMMAND_CREATE_ROOM 4
 
 typedef struct server
 {
@@ -30,7 +26,7 @@ typedef struct server
 }server_t;
 
 server_t* init_server();
-void start_server(server_t* server);
+void run_server(server_t* server);
 
 
 #endif

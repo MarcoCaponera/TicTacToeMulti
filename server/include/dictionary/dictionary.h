@@ -18,5 +18,5 @@ int dict_setup(dictionary_t* map, const size_t num_slots);
 int dict_add(dictionary_t* map, const char* key, void* value);
 int dict_contains_key(dictionary_t* map, const char* key);
 void dict_iter_keys(dictionary_t* map, void (*callback)(const char* key));
-int dict_remove(dictionary_t * map, const char* key);
+int dict_remove(dictionary_t * map, const char* key, void (*callback)(void**));
 void* dict_get_value_by_key(dictionary_t* dict, const char* key);

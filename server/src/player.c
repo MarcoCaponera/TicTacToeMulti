@@ -20,12 +20,16 @@ player_t* init_player(char* player_name)
     return player;
 }
 
-int destroy_player(player_t** player)
+// expected pointer to player
+void free_player_used_resources(void** player)
+{
+    player_t* p = (player_t*)*player;
+    free(p->name);
+}
+
+void destroy_player(player_t** player)
 {
     player_t* p = *player;
     free(p->name);
     free(p);
-    player = NULL;
-
-    return 0;
 }

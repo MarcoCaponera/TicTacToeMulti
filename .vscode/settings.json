@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "tictactoe_server.h": "c"
+        "tictactoe_server.h": "c",
+        "utils.h": "c"
     }
 }

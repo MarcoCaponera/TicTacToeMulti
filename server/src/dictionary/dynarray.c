@@ -90,13 +90,15 @@ int dynarray_reserve(dynarray_t* arr, const size_t elements)
     return dynarray_set_capacity(arr, arr->capacity + elements);
 }
 
-int dynarray_remove(dynarray_t* arr, const size_t index)
+int dynarray_remove(dynarray_t* arr, const size_t index, void (*callback)(void**))
 {
     if(index >= arr->length)
     {
         return -1;
     }
 
+    void* curr = &arr->data[index * arr->type_size];
+    callback(&curr);
     if(arr->length > 0 && index == arr->length - 1)
     {
         arr->length--;
