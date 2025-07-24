@@ -1,77 +1,93 @@
-#ifdef _WIN32
- #include <WinSock2.h>
- #include <ws2tcpip.h>
- #include <windows.h>
- #else
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
- #include <unistd.h>
- #endif
- #include <stdio.h>
+#include <stdio.h>
+#include "client.h"
+#include "win_wrap.h"
+#include "utils.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
 
- #include "client.h"
- #include <string.h>
- #include <stdint.h>
+client_t* client;
+dynarray_t* join_acknowledge_event;
 
- client_t* init_client()
- {
-    client_t* client = malloc(sizeof(client_t));
-
+client_t* init_client()
+{
+    client = malloc(sizeof(client_t));
     if(client == NULL)
     {
         perror("malloc()");
         return NULL;
     }
-
     memset(client, 0, sizeof(client_t));
 
- #ifdef _WIN32
-    // this part is only required on Windows: it initializes the Winsock2 dll
-    WSADATA wsa_data;
-    if (WSAStartup(0x0202, &wsa_data))
+    if(init_socket())
     {
-        printf("unable to initialize winsock2 \n");
+        printf("could not initialize win socket\n");
         return NULL;
     }
- #endif
-    client->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (client->socket < 0)
+
+    if(init_socket_client(client))
     {
-        printf("unable to initialize the UDP socket \n");
+        printf("could not initialize client\n");
         return NULL;
     }
-    struct sockaddr_in sin;
-    inet_pton(AF_INET, "127.0.0.1", &sin.sin_addr); // this will create a big endian 32 bit address
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(9999); // converts 9999 to big endian
 
-    memcpy(&client->sock_addr, &sin, sizeof(struct sockaddr_in));
-
+    join_acknowledge_event = malloc(sizeof(dynarray_t));
+    dynarray_init(join_acknowledge_event, BASE_JA_SUBS, 8);
+    
     return client;
- }
+}
 
- void destroy_client(client_t** client)
- {
-    client_t* c = *client;
-    free(c->name);
-    free(c);
- }
+void destroy_client()
+{
+    free(client->name);
+    free(client);
+}
 
- int set_client_name(client_t* client, const char* name)
- {
+int set_client_name(const char* name)
+{
     size_t len = strlen(name);
-    printf("len: %llu\n", len);
-    client->name = malloc(len+1);
+    if(client->name == NULL)
+    {
+        client->name = malloc(len+1);
+    }
+    else
+    {
+        client->name = realloc(client->name, len+1);
+    }
+
     if(client->name == NULL)
     {
         perror("malloc()");
         return -1;
     }
-
     memset(client->name, 0, len+1);
     memcpy(client->name, name, len);
     client->name[len] = '\0';
-
     return 0;
- }
+}
+
+void subscribe_to_join_ack(JA_CALLBACK_TYPE(callback))
+{
+    dynarray_append(join_acknowledge_event, callback);
+}
+
+int connect_to_server()
+{
+    char data[MESSAGE_MAX_SIZE] = {0};
+    unsigned int rid = 0;
+    char* srid = (char*)&rid; 
+    memcpy(data, srid, RID_SIZE);
+    unsigned int command = COMMAND_CHALLENGE;
+    command = btol((char*)&command, sizeof(unsigned int));
+    char* scommand = (char*)&command;
+    memcpy(&data[RID_SIZE], scommand, COMMAND_SIZE);
+    memcpy(&data[RID_SIZE + COMMAND_SIZE], client->name, strlen(client->name));
+    send_data_to(client->socket, "127.0.0.1", 9999, data, MESSAGE_MAX_SIZE);
+    return 0;
+}
+
+void update_client()
+{
+    char* data = rec_data(client->socket, "127.0.0.1", 9999);
+}
+

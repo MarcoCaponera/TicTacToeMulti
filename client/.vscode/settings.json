@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "client.h": "c",
+        "ws2tcpip.h": "c",
+        "raylib_wrap.h": "c"
+    }
+}

@@ -81,6 +81,7 @@ void tick(server_t* server)
     inet_ntop(AF_INET, &sender_in.sin_addr, addr_as_string, 64);
     int rid = ltob(buffer, sizeof(int));
     int command = ltob(&buffer[4], sizeof(int));
+    printf("porcoddio %i\n", command);
     if(command == COMMAND_JOIN)
     {
         char* entry = malloc(32);
@@ -95,9 +96,13 @@ void tick(server_t* server)
             kick_player(server, entry);
             return;
         }
-        printf("adding player\n");
+        printf("adding player %s\n", &buffer[RID_SIZE + COMMAND_SIZE]);
         player_t* new_player = init_player(&buffer[8]);
         dict_add(server->players, entry, new_player); 
+    }
+    else if(command == COMMAND_CHALLENGE)
+    {
+        printf("dayumn\n");
     }
 }
 

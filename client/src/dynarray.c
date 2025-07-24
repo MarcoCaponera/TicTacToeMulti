@@ -3,6 +3,9 @@
 #include <string.h>
 #include "dynarray.h"
 
+// EXERCISE 1 - use realloc - DONE
+// EXERCISE 2 - type independent - DONE
+
 static size_t malloc_counter = 0;
 static size_t malloc_total_allocations = 0;
 
@@ -110,6 +113,7 @@ int dynarray_remove(dynarray_t* arr, const size_t index, void (*callback)(void**
 
 int dynarray_set_capacity(dynarray_t* arr, const size_t new_capacity)
 {
+
     if(new_capacity < arr->length)
     {
         return -1;

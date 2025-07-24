@@ -1,14 +1,11 @@
 #ifndef GENERALDEFINES_H
 #define GENERALDEFINES_H
 
-#define COMMAND_JOIN 0
-#define COMMAND_CHALLENGE 1
-#define COMMAND_MOVE 2
-#define COMMAND_QUIT 3
-#define COMMAND_CREATE_ROOM 4
+#include "raylib.h"
 
-#define MESSAGE_MAX_SIZE 28
-#define RID_SIZE 4
-#define COMMAND_SIZE 4
+// defines
+// -----------------------------------------------------
+#define SCREEN_CENTER_X GetScreenWidth() * 0.5f
+// -----------------------------------------------------
 
 #endif

@@ -1,24 +1,29 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#ifdef _WIN32
-#include <WinSock2.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif 
+#include "dynarray.h"
+#include "general_net_defines.h"
+
+#define BASE_JA_SUBS                  5
+#define JA_CALLBACK_TYPE(callback)    void(*callback)(int)
 
 typedef struct client
 {
     int socket;
-    struct sockaddr_in sock_addr;
+    unsigned short addr_family;
+    unsigned short port;
     char* name;
 } client_t;
 
+extern client_t* client;
+extern dynarray_t* join_acknowledge_event;
+
 client_t* init_client();
-int set_client_name(client_t* client, const char* name);
-void destroy_client(client_t** client);
+int set_client_name(const char* name);
+void destroy_client();
+int connect_to_server();
+void update_client();
+void subscribe_to_join_ack(JA_CALLBACK_TYPE(callback));
+void unsubscribe_from_join_ack(JA_CALLBACK_TYPE(callback));
 
 #endif
